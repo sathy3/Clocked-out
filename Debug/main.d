@@ -18,6 +18,9 @@ main.obj: D:/Git\ Repos/LabGroupA1/Util/launchpad.h
 main.obj: C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/gpio.h
 main.obj: ../seg7.h
 main.obj: ../seg7digit.h
+main.obj: ../motion.h
+main.obj: ../ranger.h
+main.obj: ../pwmbuzzer.h
 
 ../main.c: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_18.12.4.LTS/include/stdint.h: 
@@ -37,3 +40,6 @@ D:/Git\ Repos/LabGroupA1/Util/launchpad.h:
 C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/gpio.h: 
 ../seg7.h: 
 ../seg7digit.h: 
+../motion.h: 
+../ranger.h: 
+../pwmbuzzer.h: 
