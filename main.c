@@ -29,7 +29,8 @@ enum{
 } personState= not_detected;
 
 enum{
-	setTime, 
+	Off, SetHr, SetMin, SetAlarm
+}   Setting_State= Off;
 
 // The initial state of the 7-segment display: "00:00" with colon on
 seg7Display_t seg7Display = {
