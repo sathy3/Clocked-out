@@ -8,11 +8,8 @@
 #include "ranger.h"
 #include "buzzer.h"
 #include "ras.h"
-/*
- * System states
- */
 
-// The running state of the stopwatch system
+// The running state of the system
 enum{
     Run, Set, alarmSet
 	}  sysState = Run;
@@ -35,6 +32,7 @@ typedef enum {Ac, Ic} OnOff_t;
 seg7Display_t seg7Display = {
     0, 0, 0, 0, 1
 };
+seg7Display_t ttime= {0,0,0,0,1};
 
 extern timeIncrement(seg7Display_t *);
 volatile uint32_t sec= 0;
@@ -59,11 +57,11 @@ void chkPerson(uint32_t time){
         {   personState=not_present;
             if(motionSensor()==0)
             {
-                if(times<3)
+                if(times<255)
                 {
                     times++;
                 }
-                else if(times==3)
+                else if(times==255)
                 {
                     seated=0;
                     times=0;
@@ -81,20 +79,6 @@ void chkPerson(uint32_t time){
         }
         }
         ;
-        if(display_s==showTimeout)
-        {   int temp=0;
-            seg7Display_t ttime={0,0,0,0,1};
-            temp= (limit-seated)/60000;
-            if (temp>=0)
-            {
-            ttime.d1=temp%10;
-            ttime.d2=(temp/10)%10;
-            ttime.d3=(temp/100)%10;
-            ttime.d4=(temp/1000)%10;
-            }
-            seg7DigitUpdate(&ttime);
-
-        }
         if(seated>=limit&&alarmState!=disabled)
         {
             alarmState=On;
@@ -139,10 +123,6 @@ stopWatchUpdate(uint32_t time)                          // The scheduled time
     else{
         sec=0;
     }
-    if (display_s == showTime)
-        {
-        seg7DigitUpdate(&seg7Display);
-        }
     // Call back after 1 seconds
     schdCallback(stopWatchUpdate, time + 1000);
 }
@@ -193,12 +173,9 @@ checkPushButton(uint32_t time)
 // Buzzer state
 static OnOff_t buzzerState = Ic;
 
-/*
- * Task 1: Play the buzzer
- */
-
 // Callback function for playing the buzzer
-void callbackBuzzerPlay(uint32_t time)                    // the scheduled time
+void 
+callbackBuzzerPlay(uint32_t time)   
 {
     uint32_t delay = 10;
 
@@ -226,6 +203,86 @@ void callbackBuzzerPlay(uint32_t time)                    // the scheduled time
     // schedule the next callback
     schdCallback(callbackBuzzerPlay, time + delay);
 }
+
+void 
+callbackdispHandler(uint32_t time)
+{	int temp=(limit-seated)/60000;
+	static uint32_t value=0; 
+	rasRead(&value);
+	
+	switch(sysState)
+	{	case Run: 
+	    if(set_mode==setTime)
+	{ledTurnOnOff(false /* red */, false /* blue */, true /* green */);}
+	    else
+	    {ledTurnOnOff(false /* red */, true /* blue */, true /* green */);}
+
+	seg7DigitUpdate(&seg7Display);
+		break;
+	case Set:
+	ledTurnOnOff(false /* red */, true /* blue */, false /* green */);
+		if(set_mode==setTime )
+		{	value= (value*60)/4096;
+			seg7Display.d1=value%10;
+			seg7Display.d2=value/10;
+		}
+		else
+		{
+			value= (value*24)/4096;
+			if(value>12)
+			{	value=value-12;
+				seg7Display.colon=0;
+				seg7Display.d3=value%10;
+				seg7Display.d4=value/10;
+			}
+			else
+			{
+			    seg7Display.colon=1;
+				seg7Display.d3=value%10;
+				seg7Display.d4=value/10;
+			}
+		}
+		seg7DigitUpdate(&seg7Display);
+		break;
+		
+	case alarmSet:
+
+		if(set_mode==setTime)
+		{	
+			ledTurnOnOff(true /* red */, false /* blue */, false /* green */);
+			value= (value*480)/4096;
+			limit= value*60000;
+			ttime.d1=(value%60)%10;
+			ttime.d2=(value%60)/10;
+			ttime.d3=(value/60)%10;
+			ttime.d4=0;
+			
+		}
+		else
+		{	
+			ledTurnOnOff(true /* red */, true /* blue */, false /* green */);
+
+            if (temp>=0)
+            {
+                ttime.d1=(temp%60)%10;
+                ttime.d2=(temp%60)/10;
+                ttime.d3=(temp/60)%10;;
+            ttime.d4=0;
+            }
+            else
+            {
+                ttime.d1=0;
+                ttime.d2=0;
+                ttime.d3=0;
+                ttime.d4=0;
+            }
+			
+		}
+		seg7DigitUpdate(&ttime);
+		break;
+	}
+	schdCallback(callbackdispHandler, time+ 30);
+}
 int
 main(void)
 {
@@ -234,7 +291,7 @@ main(void)
     rangerInit();
     motionInit();
     buzzerInit();
-
+    rasInit();
 
 
     seg7DigitUpdate(&seg7Display);
@@ -243,6 +300,7 @@ main(void)
     schdCallback(chkPerson,1004);
     schdCallback(checkPushButton, 1006);
     schdCallback(callbackBuzzerPlay, 1008);
+	schdCallback(callbackdispHandler, 1010);
 
 
     // Run the event scheduler to process callback events
