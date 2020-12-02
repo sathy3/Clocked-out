@@ -20,7 +20,8 @@ main.obj: ../seg7.h
 main.obj: ../seg7digit.h
 main.obj: ../motion.h
 main.obj: ../ranger.h
-main.obj: ../pwmbuzzer.h
+main.obj: ../buzzer.h
+main.obj: ../ras.h
 
 ../main.c: 
 C:/ti/ccs930/ccs/tools/compiler/ti-cgt-arm_18.12.4.LTS/include/stdint.h: 
@@ -42,4 +43,5 @@ C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/gpio.h:
 ../seg7digit.h: 
 ../motion.h: 
 ../ranger.h: 
-../pwmbuzzer.h: 
+../buzzer.h: 
+../ras.h: 

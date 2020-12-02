@@ -10,11 +10,11 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./buzzer.obj" \
+"./buzzer_asm.obj" \
 "./main.obj" \
 "./motion.obj" \
 "./motion_asm.obj" \
-"./pwmbuzzer.obj" \
-"./pwmbuzzer_asm.obj" \
 "./ranger.obj" \
 "./ranger_asm.obj" \
 "./ras.obj" \
@@ -168,9 +168,9 @@ Clocked\ Out.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "motion.obj" "motion_asm.obj" "pwmbuzzer.obj" "pwmbuzzer_asm.obj" "ranger.obj" "ranger_asm.obj" "ras.obj" "ras_asm.obj" "seg7.obj" "sig7digit.obj" "sw_increment.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "main.d" "motion.d" "pwmbuzzer.d" "ranger.d" "ras.d" "seg7.d" "tm4c123gh6pm_startup_ccs.d" 
-	-$(RM) "motion_asm.d" "pwmbuzzer_asm.d" "ranger_asm.d" "ras_asm.d" "sig7digit.d" "sw_increment.d" 
+	-$(RM) "buzzer.obj" "buzzer_asm.obj" "main.obj" "motion.obj" "motion_asm.obj" "ranger.obj" "ranger_asm.obj" "ras.obj" "ras_asm.obj" "seg7.obj" "sig7digit.obj" "sw_increment.obj" "tm4c123gh6pm_startup_ccs.obj" 
+	-$(RM) "buzzer.d" "main.d" "motion.d" "ranger.d" "ras.d" "seg7.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "buzzer_asm.d" "motion_asm.d" "ranger_asm.d" "ras_asm.d" "sig7digit.d" "sw_increment.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

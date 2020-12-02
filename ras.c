@@ -1,40 +1,67 @@
+/*
+ * ras.c
+ *
+ *      Contributors: Siddhant Sathyan
+ */
 #include <stdint.h>
 #include <stdbool.h>
 #include <driverlib/sysctl.h>
 #include <inc/hw_memmap.h>
-#include <driverlib/gpio.h>
-#include <driverlib/adc.h>
 #include <driverlib/pin_map.h>
+#include <driverlib/adc.h>
+#include <driverlib/adc.c>
 #include "launchpad.h"
 #include "ras.h"
 
-//initiation
+#define RAS_PERIPH  SYSCTL_PERIPH_ADC0
+#define RAS_PORT    ADC0_BASE
+#define SEQ_NUM     0
+#define SEQ_NUM2    1
+
+// Initialize ADC for RAS
 void rasInit()
 {
-    //enable ADC0 module function calling
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+    // Enable the ADC0 peripheral.
+    //
+    SysCtlPeripheralEnable(RAS_PERIPH);
 
-    //waits for ADC0 module to be ready
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC0)) {}
+    while(!SysCtlPeripheralReady(RAS_PERIPH))
+    {
+    }
+ //   SysCtlPeripheralEnable(MOT_PERIPH);
 
-    //enable the sample sequence to capture the value of channel 7 when the processor
-    //trigger occurs
-    ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
-    ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH7);
-    ADCSequenceEnable(ADC0_BASE, 0);
+        // Configure the pin as output
+     //GPIOPinTypeGPIOInput(MOT_PORT, MOT_PIN);
+
+    //Configure ADC0, sequencer #0
+    ADCSequenceConfigure(RAS_PORT, SEQ_NUM, ADC_TRIGGER_PROCESSOR, 0);
+
+    //Configure the sequencer
+    ADCSequenceStepConfigure(RAS_PORT, SEQ_NUM, 0,
+    ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH7);
+    //Enable the ADC sequencer
+    ADCSequenceEnable(RAS_PORT, SEQ_NUM);
 }
-
-void rasInit_2()
+void ras2Init()
 {
-    //enable ADC1 module function calling
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
+    // Enable the ADC0 peripheral.
+    //
+    SysCtlPeripheralEnable(RAS_PERIPH);
 
-    //waits for ADC1 module to be ready
-    while(!SysCtlPeripheralReady(SYSCTL_PERIPH_ADC1)) {}
+    while(!SysCtlPeripheralReady(RAS_PERIPH))
+    {
+    }
 
-    //enable the sample sequence to capture the value of channel 6 when the processor
-    //trigger occurs
-    ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
-    ADCSequenceStepConfigure(ADC1_BASE, 0, 0, ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH6);
-    ADCSequenceEnable(ADC1_BASE, 0);
+    ADCSequenceConfigure(RAS_PORT, SEQ_NUM2, ADC_TRIGGER_PROCESSOR, 0);
+
+
+    //Configure ADC0, sequencer #1
+        ADCSequenceConfigure(RAS_PORT, SEQ_NUM2, ADC_TRIGGER_PROCESSOR, 0);
+
+        //Configure the sequencer
+        ADCSequenceStepConfigure(RAS_PORT, SEQ_NUM2, 0,
+        ADC_CTL_IE | ADC_CTL_END | ADC_CTL_CH6);
+
+    //Enable the ADC sequencer
+    ADCSequenceEnable(RAS_PORT, SEQ_NUM2);
 }

@@ -1,46 +1,60 @@
-                .cdecls "stdint.h","stdbool.h","inc/hw_memmap.h","driverlib/pin_map.h","driverlib/sysctl.h","driverlib/gpio.h","ras.h","driverlib/adc.h", "launchpad.h"
+;
+; Lab 6, ECE 266, fall 2020
+;
+; Assembly function to read ADC.
+;
+; Created by Siddhant Sathyan
+;
+
+; To include names declared in C
+                .cdecls "stdint.h","stdbool.h","inc/hw_memmap.h","driverlib/pin_map.h","driverlib/sysctl.h","driverlib/adc.h","ras.h"
 
                 .text
                 .global rasRead
-                .global rasRead_2
+                .global ras2Read
 
-ui32Base     	.field  ADC0_BASE
-ui32Base2		.field	ADC1_BASE
+RAS_PORT     .field  ADC0_BASE
+SEQ_NUM      .byte	 0
+SEQ_NUM2     .byte	 1
+;
+;
+;
+rasRead		PUSH 	{LR}			;Reads the ADC signals.
+			PUSH 	{r0}
+			LDR     r0, RAS_PORT
+            LDRB	r1, SEQ_NUM
+            BL		ADCProcessorTrigger
+tes_loop    LDR		r0, RAS_PORT
+			LDRB	r1, SEQ_NUM
+			MOV		r2, #0
+			BL		ADCIntStatus
+			CMP		r0, #0
+			BNE     tes_loop
+			LDR		r0, RAS_PORT
+			LDRB	r1, SEQ_NUM
+			POP		{r2}
+			BL 		ADCSequenceDataGet
+			LDR		r0, RAS_PORT
+			LDRB	r1, SEQ_NUM
+			BL		ADCIntClear
+			POP		{PC}
 
-rasRead         PUSH    {LR}
-                LDR     r0, ui32Base			; load value from ras
-                MOV     r1, #0
-                BL      ADCProcessorTrigger		; call to initiate sample sequence
-
-while_loop      LDR     r0, ui32Base			; load value from ras
-                MOV     r1, #0
-                MOV     r2, #0
-                BL      ADCIntStatus			; check interrupt status
-                CMP     r0, #0
-                BEQ     while_loop				; repeat loop if r0 == 0
-
-                SUB     sp, #4
-                LDR     r0, ui32Base
-                MOV     r1, #0
-                MOV     r2, sp
-                BL      ADCSequenceDataGet		; get data from sample sequence results
-
-rasRead_2       PUSH	{LR}
-                LDR     r0, ui32Base2
-                MOV     r1, #0
-                BL      ADCProcessorTrigger
-
-while_loop2     LDR     r0, ui32Base2
-                MOV     r1, #0
-                MOV     r2, #0
-                BL      ADCIntStatus
-                CMP     r0, #0
-                BEQ     while_loop2
-
-                SUB     sp, #4
-                LDR     r0, ui32Base2
-                MOV     r1, #0
-                MOV     r2, sp
-                BL      ADCSequenceDataGet
-
-                POP     {r0, pc}
+ras2Read	PUSH 	{LR}
+			PUSH 	{r0}
+			LDR     r0, RAS_PORT
+            LDRB	r1, SEQ_NUM2
+            BL		ADCProcessorTrigger
+tes2_loop   LDR		r0, RAS_PORT
+			LDRB	r1, SEQ_NUM2
+			MOV		r2, #0
+			BL		ADCIntStatus
+			CMP		r0, #0
+			BNE     tes2_loop
+			LDR		r0, RAS_PORT
+			LDRB	r1, SEQ_NUM2
+			POP		{r2}
+			BL 		ADCSequenceDataGet
+			LDR		r0, RAS_PORT
+			LDRB	r1, SEQ_NUM2
+			BL		ADCIntClear
+			POP		{PC}

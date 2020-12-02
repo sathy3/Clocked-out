@@ -1,13 +1,20 @@
-// Header file for Rotary Analog Sensor
-// Author: Drew, Irakils, and James
+/*
+ * ECE 266, fall 2020, Lab 6
+ *
+ * ras.h: Header file for ras-related functions
+ *
+ * Created by Muhammad, Contributed by Siddhant
+ *
+ */
 
 #ifndef RAS_H_
 #define RAS_H_
 
+// Initialize the RAS
 void rasInit();
-int rasRead();
+void ras2Init();
+void rasRead(uint32_t* data);
+void ras2Read(uint32_t* data);
 
-void rasInit_2();
-int rasRead_2();
 
 #endif /* RAS_H_ */
